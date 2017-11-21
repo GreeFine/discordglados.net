@@ -1,0 +1,10 @@
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\obj\Debug\DiscordBot.csproj.CoreCompileInputs.cache
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\bin\Debug\DiscordBot.exe.config
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\bin\Debug\DiscordBot.exe
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\bin\Debug\DiscordBot.pdb
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\bin\Debug\Newtonsoft.Json.dll
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\bin\Debug\websocket-sharp.dll
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\bin\Debug\Newtonsoft.Json.xml
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\obj\Debug\DiscordBot.csprojResolveAssemblyReference.cache
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\obj\Debug\DiscordBot.exe
+C:\Users\GreeFine\source\repos\DiscordBot\DiscordBot\obj\Debug\DiscordBot.pdb
