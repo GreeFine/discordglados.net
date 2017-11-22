@@ -114,5 +114,13 @@ namespace DiscordBot
                 names.Add(channel.Key);
             return names;
         }
+
+        public bool containChanel(string p_channel_id)
+        {
+            foreach (var channel in Channels_list)
+                if (channel.Value.id == p_channel_id)
+                    return (true);
+            return (false);
+        }
     }
 }
