@@ -52,7 +52,6 @@
     <Compile Include="Gateway.cs" />
     <Compile Include="Guilds.cs" />
     <Compile Include="Me.cs" />
-    <Compile Include="Messages.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

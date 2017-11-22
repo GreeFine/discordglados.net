@@ -16,8 +16,6 @@ namespace DiscordBot
         public static readonly Core instance = new Core();
         private Core() { }
 
-        public JArray Guilds_ { get => Guilds_; set => Guilds_ = saveJSON("guilds.json", value); }
-        public Dictionary<string, string> channels_ = new Dictionary<string, string>();
         public const string bot_token_ = "MzgwMzEwOTgwODA4NDA5MDg5.DPMlaA.ejWsbNkaqrIHUPSU8us5wYNd5Uc";
         public const string client_id_ = "380310980808409089";
         public const string client_secret_ = "erJTxd0T2moIeqFykHIdULIrhnq7YJoY";
@@ -30,16 +28,6 @@ namespace DiscordBot
             return ("https://discordapp.com/oauth2/authorize?client_id=380310980808409089&scope=bot&permissions=137612352");
         }
 
-        public JArray saveJSON(string filename, JArray json)
-        {
-           FileStream fs = new FileStream("", FileMode.CreateNew);
-
-            using (StreamWriter fsw = new StreamWriter(fs))
-            {
-                fsw.Write(json);
-            }
-            return json;
-        }
 
         public async Task<JObject> Post(JObject p_data, string p_endpoint)
         {

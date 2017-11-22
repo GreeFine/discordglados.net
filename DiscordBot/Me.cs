@@ -1,5 +1,6 @@
 ﻿using AREA.API;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace DiscordBot
 {
@@ -9,6 +10,8 @@ namespace DiscordBot
         private Me() { }
 
         Core Core = Core.instance;
+
+        public Dictionary<string, Guilds> guilds = new Dictionary<string, Guilds>();
 
         public JArray getOauth2()
         {
@@ -20,15 +23,25 @@ namespace DiscordBot
             return Core.Get("/users/@me");
         }
 
-        public JArray getGuilds()
+        public void getGuilds()
         {
             var guilds_get = Core.Get("/users/@me/guilds");
-            foreach (JObject guild_get in guilds_get)
+            foreach (JObject guild in guilds_get)
             {
-                foreach (JObject guild_stored in Core.Guilds_)
-                    guild.info_ = g;
+                var name = guild.Value<string>("name");
+                if (!guilds.ContainsKey(name))
+                    guilds[name] = new Guilds();
+                guilds[name].id = guild.Value<string>("id");
+                guilds[name].name = name;
             }
-            return Core.Guilds_;
+        }
+
+        public List<string> getGuildsNames()
+        {
+            List<string> names = new List<string>();
+            foreach (var guild in guilds)
+                names.Add(guild.Key);
+            return (names);
         }
 
         public JArray getChannels()

@@ -1,95 +1,118 @@
 ﻿using AREA.API;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace DiscordBot
 {
     public class Guilds
     {
-        public static readonly Guilds instance = new Guilds();
-        private Guilds() { }
-
         Core Core = Core.instance;
 
-        public List<string> getGuildsNames()
+        public string id;
+        public string name;
+        private Dictionary<string, Channels> channels_list_;
+        public Dictionary<string, Channels> Channels_list { get { if (channels_list_ == null) getChannels(); return channels_list_; } set { channels_list_ = value; } }
+        public class Channels
+        {
+            Core Core = Core.instance;
+            public string id;
+            public string name;
+
+            public JArray getInfo()
+            {
+                return Core.Get("/channels/" + id);
+            }
+            public JArray getMessages(string p_channel_id, int limit = 50)
+            {
+                return Core.Get("/channels/" + p_channel_id + "/messages?limit=" + limit.ToString());
+            }
+            public string send(string p_msg)
+            {
+                JObject jo = new JObject();
+                jo["content"] = p_msg;
+
+                return (Core.Post(jo, "/channels/" + id + "/messages").Result).Value<string>("id");
+            }
+        }
+        private Dictionary<string, Members> members_list_;
+        public Dictionary<string, Members> Members_list { get { if (members_list_ == null) getMembers(); return members_list_; } set { members_list_ = value; } }
+        public class Members
+        {
+            Core Core = Core.instance;
+            public string id;
+            public string name;
+            public string Private_Channel;
+            public string send(string p_msg)
+            {
+                JObject jo = new JObject();
+                jo["content"] = p_msg;
+
+                return (Core.Post(jo, "/channels/" + id + "/messages").Result).Value<string>("id");
+            }
+
+            public void createChannel()
+            {
+                if (String.IsNullOrEmpty(Private_Channel))
+                {
+                    JObject jo = new JObject();
+                    jo["recipient_id"] = id;
+                    Private_Channel = (Core.Post(jo, "/users/@me/channels").Result).Value<string>("id");
+                }
+            }
+        }
+
+        public JArray updateJSON(string filename, JArray json)
+        {
+            FileStream fs = new FileStream(filename, FileMode.CreateNew);
+            using (StreamWriter fsw = new StreamWriter(fs))
+                fsw.Write(json);
+            return json;
+        }
+
+        public JArray getInfo()
+        {
+            return Core.Get("/guilds/" + id);
+        }
+
+        public void getMembers(int limit = 1)
+        {
+            if (members_list_ == null)
+                members_list_ = new Dictionary<string, Members>();
+            var membersGet = Core.Get("/guilds/" + id + "/members?limit=" + limit.ToString());
+            foreach (var member in membersGet)
+            {
+                var name = member.Value<string>("name");
+                if (!members_list_.ContainsKey(name))
+                    members_list_[name] = new Members();
+                members_list_[name].id = member.Value<string>("id");
+                members_list_[name].name = member.Value<string>("name");
+            }
+        }
+
+        public void getChannels()
+        {
+            if (channels_list_ == null)
+                channels_list_ = new Dictionary<string, Channels>();
+            var channelsGet = Core.Get("/guilds/" + id + "/channels");
+            foreach (var channel in channelsGet)
+            {
+                var name = channel.Value<string>("name");
+                if (!channels_list_.ContainsKey(name))
+                    channels_list_[name] = new Channels();
+                channels_list_[name].id = channel.Value<string>("id");
+                channels_list_[name].name = name;
+            }
+        }
+
+        public List<string> channelsNames(string p_guild_id)
         {
             List<string> names = new List<string>();
-            foreach (var guild in Core.Guilds_)
-                names.Add(guild.Value<string>("name"));
-            return (names);
-        }
 
-        public string getGuildId(string p_guild_name)
-        {
-            foreach (var guild in Core.Guilds_)
-                if (guild.Value<string>("name") == p_guild_name)
-                    return (guild.Value<string>("id"));
-            return ("Invalid");
-        }
-
-        public JArray getGuildInfo(string p_guild_id)
-        {
-            return Core.Get("/guilds/" + p_guild_id);
-        }
-
-        public JArray getGuildMembers(string p_guild_id, int limit = 1)
-        {
-            Core.Guilds_[p_guild_id]["members"] = Core.Get("/guilds/" + p_guild_id + "/members?limit=" + limit.ToString());
-            return Core.Guilds_[p_guild_id].Value<JArray>("members");
-        }
-
-        public string getGuildMemberName(string p_guild_id, string p_member_id)
-        {
-            foreach (var m in Core.Guilds_[p_guild_id].Value<JArray>("members"))
-            {
-                if (m["user"].Value<string>("id") == p_member_id)
-                    return (m["user"].Value<string>("nane"));
-            }
-            return ("Invalid");
-        }
-
-        public string getGuildMemberId(string p_guild_id, string name)
-        {
-            foreach (var m in Core.Guilds_[p_guild_id].Value<JArray>("members"))
-            {
-                if (m["user"].Value<string>("username") == name)
-                    return (m["user"].Value<string>("id"));
-            }
-            return ("Invalid");
-        }
-
-        public JArray getGuildChannels(string p_guild_id)
-        {
-            Core.Guilds_[p_guild_id]["channels"] = Core.Get("/guilds/" + p_guild_id + "/channels");
-            return Core.Guilds_[p_guild_id].Value<JArray>("channels"); ;
-        }
-
-        public List<string> getGuildChannelsNames(string p_guild_id)
-        {
-            List<string> names = new List<string>();
-
-            foreach (var channel in Core.Guilds_[p_guild_id]["channels"])
-                names.Add(channel.Value<string>("name"));
+            foreach (var channel in Channels_list)
+                names.Add(channel.Key);
             return names;
         }
-
-        public string getGuildChannelId(string p_guild_id, string p_channel_name)
-        {
-            foreach (var channel in Core.Guilds_[p_guild_id]["channels"])
-                if (channel.Value<string>("name") == p_channel_name)
-                    return (channel.Value<string>("id"));
-            return "Invalid";
-        }
-
-        public JArray getGuildChannelInfo(string p_channel_id)
-        {
-            return Core.Get("/channels/" + p_channel_id);
-        }
-
-        public JArray getChannelMessages(string p_channel_id, int limit = 50)
-        {
-            return Core.Get("/channels/" + p_channel_id + "/messages?limit=" + limit.ToString());
-        }
-
     }
 }
