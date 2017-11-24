@@ -24,18 +24,22 @@ namespace DiscordBot
             var line = "";
             th.Start();
 
-            discord.Me.getGuilds();
-
             var guild = "";
             var channel = "";
             while ((line = Console.ReadLine()) != "exit")
             {
-                if (line.StartsWith("/guilde"))
-                    Console.WriteLine("guilde=" + (guild = line.Replace("/guilde ", "")));
-                else if (line.StartsWith("/channel"))
-                    Console.WriteLine("channel=" + (channel = line.Replace("/channel ", "")));
-                else if (line.StartsWith("/send"))
-                    discord.Me.guilds[guild].Channels_list[channel].send(line.Replace("/send", ""));
+//                try
+//                {
+                    if (line.StartsWith("/guilde"))
+                        Console.WriteLine("guilde=" + (guild = line.Replace("/guilde ", "")));
+                    else if (line.StartsWith("/channel"))
+                        Console.WriteLine("channel=" + (channel = line.Replace("/channel ", "")));
+                    else if (line.StartsWith("/send"))
+                        discord.Me.Guilds[guild].Channels_list[channel].sendMessage(line.Replace("/send", "")).addReaction("♥");
+                    else if (line.StartsWith("/emojis"))
+                        Console.WriteLine(discord.Me.Guilds[guild].getEmojis());
+//                }
+//                catch (Exception e) { Console.WriteLine(e.Message); }
             }
         }
     }

@@ -39,6 +39,15 @@ namespace DiscordBot
             return JObject.Parse(response.Content.ReadAsStringAsync().Result);
         }
 
+        public async void Put(JObject p_data, string p_endpoint)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
+
+            var content = new StringContent(p_data.ToString(), Encoding.UTF8, "application/json");
+            var response = await client.PutAsync(base_api_url_ + p_endpoint, content);
+        }
+
         public JArray Get(string p_endpoint)
         {
             var html = "";

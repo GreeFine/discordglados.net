@@ -11,7 +11,8 @@ namespace DiscordBot
 
         Core Core = Core.instance;
 
-        public Dictionary<string, Guilds> guilds = new Dictionary<string, Guilds>();
+        private Dictionary<string, Guilds> guilds_;
+        public Dictionary<string, Guilds> Guilds { get { if (guilds_ == null) getGuilds(); return guilds_;  } set { guilds_ = value; } }
 
         public JArray getOauth2()
         {
@@ -25,21 +26,22 @@ namespace DiscordBot
 
         public void getGuilds()
         {
+            guilds_ = new Dictionary<string, Guilds>();
             var guilds_get = Core.Get("/users/@me/guilds");
             foreach (JObject guild in guilds_get)
             {
                 var name = guild.Value<string>("name");
-                if (!guilds.ContainsKey(name))
-                    guilds[name] = new Guilds();
-                guilds[name].id = guild.Value<string>("id");
-                guilds[name].name = name;
+                if (!guilds_.ContainsKey(name))
+                    guilds_[name] = new Guilds();
+                guilds_[name].id = guild.Value<string>("id");
+                guilds_[name].name = name;
             }
         }
 
         public List<string> getGuildsNames()
         {
             List<string> names = new List<string>();
-            foreach (var guild in guilds)
+            foreach (var guild in Guilds)
                 names.Add(guild.Key);
             return (names);
         }

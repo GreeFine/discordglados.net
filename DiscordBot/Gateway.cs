@@ -111,7 +111,7 @@ namespace DiscordBot
 
                 foreach (var responnse in mentioned_responsse)
                 {
-                    if (responnse.Item1 == null || Me.guilds[responnse.Item1].containChanel(channel_id))
+                    if (responnse.Item1 == null || Me.Guilds[responnse.Item1].containChanel(channel_id))
                         if (msg == responnse.Item2.ToLower())
                         {
                             sendMessage(channel_id, "<@" + d["author"].Value<string>("id") + "> " + responnse.Item3);
