@@ -1,0 +1,26 @@
+{
+  "Groups": {
+    "test": {
+      "members": {
+        "greefine": "email",
+        "zirk": "email"
+      },
+      "projects": {
+        "17/02": {
+          "endDate": "nope"
+        }
+      }
+    },
+    "vr_pool": {
+      "projects": {
+        "main": {
+          "endDate": "18/02"
+        }
+      },
+      "members": {
+        "raphael.chriqui": "chriqu_r",
+        "173013989180178432": "fail@epitech.eu"
+      }
+    }
+  }
+}
