@@ -5,8 +5,6 @@ namespace DiscordBot
 {
     public class Channels
     {
-        Core Core = Core.instance;
-
         public string id;
         public string name;
         List<Message> Messages = new List<Message>();

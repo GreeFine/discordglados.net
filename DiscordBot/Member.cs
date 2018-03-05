@@ -5,7 +5,6 @@ namespace DiscordBot
 {
     public class Members
     {
-        Core Core = Core.instance;
         public string id;
         public string name;
         public string Private_Channel;

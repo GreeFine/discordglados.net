@@ -62,6 +62,8 @@ namespace DiscordBot
                         discord.Me.Guilds[guild].Channels_list[channel].sendMessage(line.Replace("/send", "")).addReaction("♥");
                     else if (line.StartsWith("/emojis"))
                         Console.WriteLine(discord.Me.Guilds[guild].getEmojis());
+                    else if (line.StartsWith("/changename"))
+                        discord.Me.ChangeName(line.Replace("/changename ", ""));
 //                }
 //                catch (Exception e) { Console.WriteLine(e.Message); }
             }

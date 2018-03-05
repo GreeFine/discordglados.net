@@ -4,8 +4,6 @@ namespace DiscordBot
 {
     public class Message
     {
-        Core Core = Core.instance;
-
         public string id;
         public string content;
         public string author_id;

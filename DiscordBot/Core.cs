@@ -1,8 +1,5 @@
-﻿using AREA.API;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
 using System.IO;
-using System.IO.IsolatedStorage;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -13,23 +10,20 @@ namespace DiscordBot
 {
     public class Core
     {
-        public static readonly Core instance = new Core();
         private Core() { }
 
         public const string bot_token_ = "MzgwMzEwOTgwODA4NDA5MDg5.DPMlaA.ejWsbNkaqrIHUPSU8us5wYNd5Uc";
         public const string client_id_ = "380310980808409089";
         public const string client_secret_ = "erJTxd0T2moIeqFykHIdULIrhnq7YJoY";
         public const string base_api_url_ = "https://discordapp.com/api/v6";
-        public int heartbeat_interval_ = 0;
-        public int last_sequence_ = 0;
 
-        public string getLoginURL()
+        public static string getLoginURL()
         {
-            return ("https://discordapp.com/oauth2/authorize?client_id=380310980808409089&scope=bot&permissions=137612352");
+            return ("https://discordapp.com/oauth2/authorize?client_id=380310980808409089&scope=bot");
         }
 
 
-        public async Task<JObject> Post(JObject p_data, string p_endpoint)
+        public static async Task<JObject> Post(JObject p_data, string p_endpoint)
         {
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
@@ -39,7 +33,7 @@ namespace DiscordBot
             return JObject.Parse(response.Content.ReadAsStringAsync().Result);
         }
 
-        public async void Put(JObject p_data, string p_endpoint)
+        public static async void Put(JObject p_data, string p_endpoint)
         {
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
@@ -48,7 +42,7 @@ namespace DiscordBot
             var response = await client.PutAsync(base_api_url_ + p_endpoint, content);
         }
 
-        public JArray Get(string p_endpoint)
+        public static JArray Get(string p_endpoint)
         {
             var html = "";
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(base_api_url_ + p_endpoint);
@@ -66,6 +60,20 @@ namespace DiscordBot
                     html = '[' + html + ']';
                 return (JArray.Parse(html));
             }
+        }
+
+        public static async void Patch(JObject p_data, string p_endpoint)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
+            var content = new StringContent(p_data.ToString(), Encoding.UTF8, "application/json");
+
+            var method = new HttpMethod("PATCH");
+            var request = new HttpRequestMessage(method, base_api_url_ + p_endpoint)
+            {
+                Content = content
+            };
+            var returned = await client.SendAsync(request);
         }
     }
 }

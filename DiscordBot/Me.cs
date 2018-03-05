@@ -9,8 +9,6 @@ namespace DiscordBot
         public static readonly Me instance = new Me();
         private Me() { }
 
-        Core Core = Core.instance;
-
         private Dictionary<string, Guilds> guilds_;
         public Dictionary<string, Guilds> Guilds { get { if (guilds_ == null) getGuilds(); return guilds_;  } set { guilds_ = value; } }
 
@@ -50,5 +48,14 @@ namespace DiscordBot
         {
             return Core.Get("/users/@me/channels");
         }
+
+        public void ChangeName(string p_name)
+        {
+            JObject jo = new JObject();
+            jo["username"] = p_name;
+            Core.Patch(jo, "/users/@me");
+        }
+
+        
     }
 }

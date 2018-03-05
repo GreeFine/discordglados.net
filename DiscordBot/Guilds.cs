@@ -8,8 +8,6 @@ namespace DiscordBot
 {
     public class Guilds
     {
-        Core Core = Core.instance;
-
         public string id;
         public string name;
         private Dictionary<string, Channels> channels_list_;

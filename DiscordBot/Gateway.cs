@@ -12,9 +12,10 @@ namespace DiscordBot
         public static readonly Gateway instance = new Gateway();
         private Gateway() { }
 
-        Core Core = Core.instance;
         Me Me = Me.instance;
 
+        public int heartbeat_interval_ = 0;
+        public int last_sequence_ = 0;
         private List<Tuple<string, string, string, bool>> mentioned_responsse = new List<Tuple<string, string, string, bool>>();
         private List<Tuple<string, string, Func<string[], string, string>, bool>> mentioned_commands = new List<Tuple<string, string, Func<string[], string, string>, bool>>();
 
@@ -58,12 +59,12 @@ namespace DiscordBot
                 ws.Send(jo.ToString());
                 while (true)
                 {
-                    if (Core.heartbeat_interval_ > 0)
+                    if (heartbeat_interval_ > 0)
                     {
                         jo["op"] = 1;
-                        jo["d"] = Core.last_sequence_;
+                        jo["d"] = last_sequence_;
                         ws.Send(jo.ToString());
-                        Thread.Sleep(Core.heartbeat_interval_);
+                        Thread.Sleep(heartbeat_interval_);
                     }
                     else
                         Thread.Sleep(500);
@@ -79,7 +80,7 @@ namespace DiscordBot
             if (obj.Value<string>("t") != "PRESENCE_UPDATE")
                 Console.WriteLine(obj.ToString());
             if (obj.Value<int>("op") == 10)
-                Core.heartbeat_interval_ = obj.Value<JToken>("d").Value<int>("heartbeat_interval");
+                heartbeat_interval_ = obj.Value<JToken>("d").Value<int>("heartbeat_interval");
             else if (obj.Value<int>("op") == 0 && obj.Value<string>("t") == "MESSAGE_CREATE")
                 messageEvent(obj);
             else if (obj.Value<int>("op") == 0 && obj.Value<string>("t") == "VOICE_STATE_UPDATE")
