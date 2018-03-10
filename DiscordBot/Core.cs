@@ -75,5 +75,13 @@ namespace DiscordBot
             };
             var returned = await client.SendAsync(request);
         }
+        
+        public static async void Delete(string p_endpoint)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
+
+            var returned = await client.DeleteAsync(p_endpoint);
+        }
     }
 }
