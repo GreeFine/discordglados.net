@@ -5,25 +5,12 @@ namespace DiscordBot
 {
     class Priviledge
     {
-        private static JObject data;
-        private static JObject Data { get { if (data == null) initStorage(); return data; } set { data = value; } }
         const string path = @"./Priviledge.JSON";
+        private static Core.Storage storage = new Core.Storage(path);
 
-        public static void initStorage()
-        {
-            if (File.Exists(path))
-                data = JObject.Parse(File.ReadAllText(path));
-            else
-            {
-                data = new JObject();
-                File.Create(path);
-            }
-        }
+        private static JObject data;
+        private static JObject Data { get { if (data == null) data = storage.get(); return data; } set { data = value; } }
 
-        public static void saveStorage()
-        {
-            File.WriteAllText(path, Data.ToString());
-        }
 
         public static bool isAdmin(string p_id)
         {
@@ -33,11 +20,25 @@ namespace DiscordBot
         public static string getAdmins()
         {
             string list = "\n```";
+            if (Data["Admin"] == null)
+                return "Empty";
             foreach (var admin in Data["Admin"])
             {
                 list += admin.ToString() + "\n";
             }
             return list + "```";
         }
+
+        public static string addAdmin(string[] args)
+        {
+            if (args.Length != 2)
+                return "Invalid";
+            if (Data["Admin"] == null)
+                Data["Admin"] = new JObject();
+            Data["Admin"][args[0]] = args[1];
+            storage.save(Data);
+            return "Done";
+        }
+        
     }
 }

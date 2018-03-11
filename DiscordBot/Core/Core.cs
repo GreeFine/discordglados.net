@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DiscordBot
 {
-    public class Core
+    public class DiscordWebRequest
     {
-        private Core() { }
+        private DiscordWebRequest() { }
 
         public const string bot_token_ = "MzgwMzEwOTgwODA4NDA5MDg5.DPMlaA.ejWsbNkaqrIHUPSU8us5wYNd5Uc";
         public const string client_id_ = "380310980808409089";

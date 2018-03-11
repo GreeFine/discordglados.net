@@ -20,7 +20,7 @@ namespace DiscordBot
 
         private void getMessages(int limit = 50)
         {
-            var messages = Core.Get("/channels/" + id + "/messages?limit=" + limit.ToString());
+            var messages = DiscordWebRequest.Get("/channels/" + id + "/messages?limit=" + limit.ToString());
             messages_list = new Dictionary<string, Message>();
             foreach (JObject message in messages)
             {
@@ -30,7 +30,7 @@ namespace DiscordBot
 
         public JArray getInfo()
         {
-            return Core.Get("/channels/" + id);
+            return DiscordWebRequest.Get("/channels/" + id);
         }
 
         public Message sendMessage(string p_msg)
@@ -38,10 +38,10 @@ namespace DiscordBot
             JObject jo = new JObject();
             jo["content"] = p_msg;
 
-            jo = (Core.Post(jo, "/channels/" + id + "/messages").Result);
+            jo = (DiscordWebRequest.Post(jo, "/channels/" + id + "/messages").Result);
             Message message = new Message(jo, this);
-            Messages_list.Add(message.id, message);
-
+            if (!Messages_list.ContainsKey(message.id))
+                Messages_list.Add(message.id, message);
             return message;
         }
 
@@ -50,7 +50,7 @@ namespace DiscordBot
             JObject jo = new JObject();
             jo["messages"] = new JArray(p_messages_id);
 
-            Core.Post(jo, "/channels/" + id + "/messages/bulk-delete").Wait();
+            DiscordWebRequest.Post(jo, "/channels/" + id + "/messages/bulk-delete").Wait();
         }
     }
 }

@@ -6,41 +6,16 @@ namespace DiscordBot.project_recover
 {
     class Groups
     {
-        private static JObject data;
-        private static FileStream fileStream;
         const string path = @"./storage.JSON";
+        private static Core.Storage storage = new Core.Storage(path);
 
-        public void initStorage()
-        {
-            if (File.Exists(path))
-            {
-                fileStream = File.OpenRead(path);
-                using (StreamReader reader = new StreamReader(fileStream))
-                {
-                    string fileContents = reader.ReadToEnd();
-                    data = JObject.Parse(fileContents);
-                }
-            }
-            else
-            {
-                data = new JObject();
-                fileStream = File.Create(path);
-                saveStorage();
-            }
-        }
-
-        public void saveStorage()
-        {
-            using (StreamWriter writer = new StreamWriter(fileStream))
-            {
-                writer.Write(data.ToString());
-            }
-        }
+        private static JObject data;
+        public JObject Data { get { if (data == null) data = storage.get(); return data; } set { data = value; } }
 
         public string createGroup(string[] args, Message message)
         {
             Console.WriteLine(args[0]);
-            if (data.TryGetValue("Groups", out JToken groups))
+            if (Data.TryGetValue("Groups", out JToken groups))
                 groups[args[0]] = new JObject();
             else
             {
@@ -49,8 +24,7 @@ namespace DiscordBot.project_recover
                     [args[0]] = new JObject()
                 };
             }
-            data["Groups"] = groups;
-            saveStorage();
+            Data["Groups"] = groups;
             return "Done";
         }
 
@@ -58,12 +32,12 @@ namespace DiscordBot.project_recover
         {
             if (args.GetLength(0) == 2)
             {
-                if (data.TryGetValue("Groups", out JToken groups) && groups[args[0]] != null)
+                if (Data.TryGetValue("Groups", out JToken groups) && groups[args[0]] != null)
                 {
                     if (groups[args[0]]["members"] == null)
                         groups[args[0]]["members"] = new JObject();
                     groups[args[0]]["members"][message.author_id] = args[1];
-                    saveStorage();
+                    storage.save(Data);
                     return "Done";
                 }
                 else
@@ -77,12 +51,12 @@ namespace DiscordBot.project_recover
         {
             if (args.GetLength(0) == 3)
             {
-                if (data.TryGetValue("Groups", out JToken groups) && groups[args[0]] != null)
+                if (Data.TryGetValue("Groups", out JToken groups) && groups[args[0]] != null)
                 {
                     if (groups[args[0]]["projects"] == null)
                         groups[args[0]]["projects"] = new JObject();
                     groups[args[0]]["projects"][args[1]] = new JObject { ["endDate"] = args[2] };
-                    saveStorage();
+                    storage.save(Data);
                     return "Done";
                 }
                 else
@@ -95,7 +69,7 @@ namespace DiscordBot.project_recover
         public string getGroups(string[] args, Message message)
         {
             Console.WriteLine(args);
-            if (data.TryGetValue("Groups", out JToken val))
+            if (Data.TryGetValue("Groups", out JToken val))
                 Console.WriteLine(val);
             else
                 Console.WriteLine("No groups yey");
@@ -119,7 +93,7 @@ namespace DiscordBot.project_recover
         public string checkProjects(string[] args, Message message)
         {
             string returned = "\n";
-            if (data.TryGetValue("Groups", out JToken groups))
+            if (Data.TryGetValue("Groups", out JToken groups))
             {
                 foreach (JProperty member in groups["vr_pool"]["members"])
                 {

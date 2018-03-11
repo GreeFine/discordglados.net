@@ -1,5 +1,4 @@
-﻿using AREA.API;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace DiscordBot
@@ -14,18 +13,18 @@ namespace DiscordBot
 
         public JArray getOauth2()
         {
-            return Core.Get("/oauth2/applications/@me");
+            return DiscordWebRequest.Get("/oauth2/applications/@me");
         }
 
         public JArray getMe()
         {
-            return Core.Get("/users/@me");
+            return DiscordWebRequest.Get("/users/@me");
         }
 
         public void getGuilds()
         {
             guilds_ = new Dictionary<string, Guild>();
-            var guilds_get = Core.Get("/users/@me/guilds");
+            var guilds_get = DiscordWebRequest.Get("/users/@me/guilds");
             foreach (JObject guild in guilds_get)
             {
                 var name = guild.Value<string>("name");
@@ -55,14 +54,14 @@ namespace DiscordBot
 
         public JArray getChannels()
         {
-            return Core.Get("/users/@me/channels");
+            return DiscordWebRequest.Get("/users/@me/channels");
         }
 
         public void changeName(string p_name)
         {
             JObject jo = new JObject();
             jo["username"] = p_name;
-            Core.Patch(jo, "/users/@me");
+            DiscordWebRequest.Patch(jo, "/users/@me");
         }
 
         

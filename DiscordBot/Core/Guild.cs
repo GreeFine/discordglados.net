@@ -1,6 +1,4 @@
-﻿using AREA.API;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 
@@ -22,29 +20,21 @@ namespace DiscordBot
             name = p_data.Value<string>("name");
         }
 
-        public JArray updateJSON(string filename, JArray json)
-        {
-            FileStream fs = new FileStream(filename, FileMode.CreateNew);
-            using (StreamWriter fsw = new StreamWriter(fs))
-                fsw.Write(json);
-            return json;
-        }
-
         public JArray getInfo()
         {
-            return Core.Get("/guilds/" + id);
+            return DiscordWebRequest.Get("/guilds/" + id);
         }
 
         public JArray getEmojis()
         {
-            return Core.Get("/guilds/" + id + "/emojis");
+            return DiscordWebRequest.Get("/guilds/" + id + "/emojis");
         }
 
         public void getMembers(int limit = 1)
         {
             if (members_list_ == null)
                 members_list_ = new Dictionary<string, Members>();
-            var membersGet = Core.Get("/guilds/" + id + "/members?limit=" + limit.ToString());
+            var membersGet = DiscordWebRequest.Get("/guilds/" + id + "/members?limit=" + limit.ToString());
             foreach (var member in membersGet)
             {
                 var name = member.Value<string>("name");
@@ -58,13 +48,12 @@ namespace DiscordBot
         public void getChannels()
         {
             channels_list_ = new Dictionary<string, Channel>();
-            var channelsGet = Core.Get("/guilds/" + id + "/channels");
+            var channelsGet = DiscordWebRequest.Get("/guilds/" + id + "/channels");
             foreach (var channel in channelsGet)
             {
                 var name = channel.Value<string>("name");
                 if (!channels_list_.ContainsKey(name))
                     channels_list_[name] = new Channel(channel, this);
-
             }
         }
 

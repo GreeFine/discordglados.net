@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Channel.cs" />
+    <Compile Include="Core\Storage.cs" />
     <Compile Include="Features\Cleaner.cs" />
     <Compile Include="Features\csgo\stats.cs" />
     <Compile Include="Core\Discord.cs" />

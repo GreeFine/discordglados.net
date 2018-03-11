@@ -1,8 +1,6 @@
-﻿using AREA.API;
-using DiscordBot.Features;
+﻿using DiscordBot.Features;
 using DiscordBot.project_recover;
 using System;
-using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace DiscordBot
@@ -29,7 +27,7 @@ namespace DiscordBot
 
         static void groupsInit(Discord discord)
         {
-            group.initStorage();
+            //group.initStorage();
             discord.Gateway.add_mentioned_command("createGroup", (args, p_message) => group.createGroup(args, p_message), null, true);
             discord.Gateway.add_mentioned_command("getGroups", (args, p_message) => group.getGroups(args, p_message), null, true);
             discord.Gateway.add_mentioned_command("addMember", (args, p_message) => group.addMember(args, p_message), null, true);
@@ -49,9 +47,9 @@ namespace DiscordBot
             discord.Gateway.add_mentioned_reaction("poke", "Poke !");
             discord.Gateway.add_mentioned_reaction("Admin", "You are an Admin", null, true);
             discord.Gateway.add_mentioned_command("displayAdmins", (args, p_message) => Priviledge.getAdmins());
-            discord.Gateway.add_mentioned_command("cleanText", (args, p_message) => Cleaner.channel_remove_text_message(args, p_message));
+            discord.Gateway.add_mentioned_command("addAdmin", (args, p_message) => Priviledge.addAdmin(args), null, true);
 
-            
+            discord.Gateway.add_mentioned_command("cleanText", (args, p_message) => Cleaner.channel_remove_text_message(args, p_message), null, true);
 
             discord.Gateway.add_mentioned_command("help", help);
         }
@@ -72,8 +70,8 @@ namespace DiscordBot
             var channel = "";
             while ((line = Console.ReadLine()) != "exit")
             {
-//                try
-//                {
+                try
+                {
                     if (line.StartsWith("/guilde"))
                         Console.WriteLine("guilde=" + (guild = line.Replace("/guilde ", "")));
                     else if (line.StartsWith("/channel"))
@@ -86,9 +84,9 @@ namespace DiscordBot
                         discord.Me.changeName(line.Replace("/changename ", ""));
                     else if (line.StartsWith("/delete"))
                         discord.Me.Guilds[guild].Channels_list[channel].Messages_list[line.Replace("/delete ", "")].delete();
-//                }
-//                catch (Exception e) { Console.WriteLine(e.Message); }
             }
+                catch (Exception e) { Console.WriteLine(e.Message); }
+        }
         }
     }
 }

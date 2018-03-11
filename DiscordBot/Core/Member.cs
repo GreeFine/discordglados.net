@@ -13,7 +13,7 @@ namespace DiscordBot
             JObject jo = new JObject();
             jo["content"] = p_msg;
 
-            return (Core.Post(jo, "/channels/" + id + "/messages").Result).Value<string>("id");
+            return (DiscordWebRequest.Post(jo, "/channels/" + id + "/messages").Result).Value<string>("id");
         }
 
         public void createChannel()
@@ -22,7 +22,7 @@ namespace DiscordBot
             {
                 JObject jo = new JObject();
                 jo["recipient_id"] = id;
-                Private_Channel = (Core.Post(jo, "/users/@me/channels").Result).Value<string>("id");
+                Private_Channel = (DiscordWebRequest.Post(jo, "/users/@me/channels").Result).Value<string>("id");
             }
         }
     }

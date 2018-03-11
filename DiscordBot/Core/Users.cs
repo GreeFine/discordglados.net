@@ -1,5 +1,4 @@
-﻿using AREA.API;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace DiscordBot
 {
@@ -10,7 +9,7 @@ namespace DiscordBot
 
         public JArray getUser(string p_id)
         {
-            return Core.Get("/users/" + p_id);
+            return DiscordWebRequest.Get("/users/" + p_id);
         }
     }
 }

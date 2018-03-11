@@ -21,7 +21,7 @@ namespace DiscordBot
 
         private string getPath()
         {
-            return Core.Get("/gateway").First.Value<string>("url");
+            return DiscordWebRequest.Get("/gateway").First.Value<string>("url");
         }
 
         public string sendMessage(string p_channel_id, string p_msg)
@@ -29,7 +29,7 @@ namespace DiscordBot
             JObject jo = new JObject();
             jo["content"] = p_msg;
 
-            return (Core.Post(jo, "/channels/" + p_channel_id + "/messages").Result).Value<string>("id");
+            return (DiscordWebRequest.Post(jo, "/channels/" + p_channel_id + "/messages").Result).Value<string>("id");
         }
 
         public void connect()
@@ -47,7 +47,7 @@ namespace DiscordBot
                 properties["$browser"] = "Area.net";
                 properties["$device"] = "Area.net";
 
-                gateway_identify["token"] = "Bot " + Core.bot_token_;
+                gateway_identify["token"] = "Bot " + DiscordWebRequest.bot_token_;
                 gateway_identify["properties"] = properties;
                 gateway_identify["compress"] = false;
                 //gateway_identify["large_threshold"] = 50;
@@ -91,7 +91,7 @@ namespace DiscordBot
         {
             if (p_messge_event.Value<JObject>("d").TryGetValue("mentions", out JToken memtions))
                 foreach (JObject mention in memtions)
-                    if (mention.TryGetValue("id", out JToken mentioned_id) && mentioned_id.ToString() == Core.client_id_)
+                    if (mention.TryGetValue("id", out JToken mentioned_id) && mentioned_id.ToString() == DiscordWebRequest.client_id_)
                         memtioned_me(p_messge_event);
         }
 
@@ -151,7 +151,7 @@ namespace DiscordBot
 
             if (d.TryGetValue("content", out JToken content))
             {
-                var msg = content.ToString().Replace("<@" + Core.client_id_ + ">", "").Trim();
+                var msg = content.ToString().Replace("<@" + DiscordWebRequest.client_id_ + ">", "").Trim();
 
                 reaction_triger(channel_id, msg, d);
                 command_triger(channel_id, msg, d);

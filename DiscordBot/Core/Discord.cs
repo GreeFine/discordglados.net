@@ -1,6 +1,4 @@
-﻿using DiscordBot;
-
-namespace AREA.API
+﻿namespace DiscordBot
 {
     public class Discord
     {
