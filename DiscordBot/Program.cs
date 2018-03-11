@@ -16,19 +16,19 @@ namespace DiscordBot
             return "```" +
                 "!help display this message\n" +
                 "!join epitech mail : join the VR_POOL" +
+                "!csgostats SteamId : get you csogstats" + 
                 "```";
         }
 
-        static void gatewayInit(Discord discord)
+        static void steamInit(Discord discord)
+        {
+            discord.Gateway.add_mentioned_command("steamid", (args, p_user_id) => csgo.stats.steamId(args[0]));
+            discord.Gateway.add_mentioned_command("csgostats", (args, p_user_id) => csgo.stats.get(args[0]));
+        }
+
+        static void groupsInit(Discord discord)
         {
             group.initStorage();
-
-            discord.Gateway.add_mentioned_reaction("info", "I am a little bot made by GreeFine");
-            discord.Gateway.add_mentioned_reaction("", "You asked for me ?");
-            discord.Gateway.add_mentioned_reaction("poke", "Poke !");
-            discord.Gateway.add_mentioned_reaction("Admin", "You are an Admin", null, true);
-
-            discord.Gateway.add_mentioned_command("help", help);
             discord.Gateway.add_mentioned_command("createGroup", (args, p_user_id) => group.createGroup(args, p_user_id), null, true);
             discord.Gateway.add_mentioned_command("getGroups", (args, p_user_id) => group.getGroups(args, p_user_id), null, true);
             discord.Gateway.add_mentioned_command("addMember", (args, p_user_id) => group.addMember(args, p_user_id), null, true);
@@ -40,10 +40,26 @@ namespace DiscordBot
             discord.Gateway.add_mentioned_command("cloneCmd", (args, p_user_id) => RepoManager.cloneCmd(args[0], args[1]), null, true);
         }
 
+        static void basicInit(Discord discord)
+        {
+
+            discord.Gateway.add_mentioned_reaction("info", "I am a little bot made by GreeFine");
+            discord.Gateway.add_mentioned_reaction("", "You asked for me ?");
+            discord.Gateway.add_mentioned_reaction("poke", "Poke !");
+            discord.Gateway.add_mentioned_reaction("Admin", "You are an Admin", null, true);
+            discord.Gateway.add_mentioned_command("displayAdmins", (args, p_user_id) => Priviledge.getAdmins());
+
+            discord.Gateway.add_mentioned_command("help", help);
+        }
+
         static void Main(string[] args)
         {
             Discord discord = new Discord();
-            gatewayInit(discord);
+
+            basicInit(discord);
+            groupsInit(discord);
+            steamInit(discord);
+
             Thread th = new Thread(discord.Gateway.connect);
             th.Start();
 

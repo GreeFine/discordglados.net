@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channels.cs" />
-    <Compile Include="Csgo_stats\stats.cs" />
+    <Compile Include="csgo\stats.cs" />
     <Compile Include="Discord.cs" />
     <Compile Include="Gateway.cs" />
     <Compile Include="Guilds.cs" />

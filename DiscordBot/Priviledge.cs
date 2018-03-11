@@ -6,9 +6,10 @@ namespace DiscordBot
     class Priviledge
     {
         private static JObject data;
+        private static JObject Data { get { if (data == null) initStorage(); return data; } set { data = value; } }
         const string path = @"./Priviledge.JSON";
 
-        public void initStorage()
+        public static void initStorage()
         {
             if (File.Exists(path))
                 data = JObject.Parse(File.ReadAllText(path));
@@ -19,16 +20,24 @@ namespace DiscordBot
             }
         }
 
-        public void saveStorage()
+        public static void saveStorage()
         {
-            File.WriteAllText(path, data.ToString());
+            File.WriteAllText(path, Data.ToString());
         }
 
-        public bool isAdmin(string p_id)
+        public static bool isAdmin(string p_id)
         {
-            if (data == null)
-                initStorage();
-            return (data["Admin"] != null && data["Admin"][p_id] != null);
+            return (Data["Admin"] != null && Data["Admin"][p_id] != null);
+        }
+
+        public static string getAdmins()
+        {
+            string list = "\n```";
+            foreach (var admin in Data["Admin"])
+            {
+                list += admin.ToString() + "\n";
+            }
+            return list + "```";
         }
     }
 }

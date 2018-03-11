@@ -106,8 +106,6 @@ namespace DiscordBot
                         //sendMessage("382250514752208897", "<@" + user_id.ToString() + ">" + " Moved to channel : " + "<#" + channel_id + ">");
         }
 
-        private Priviledge priviledge = new Priviledge();
-
         private void reaction_triger(string p_channel_id, string p_msg, JObject p_d)
         {
             string user_id = p_d["author"].Value<string>("id");
@@ -117,7 +115,7 @@ namespace DiscordBot
                 if ((responnse.Item1 == null || Me.Guilds[responnse.Item1].containChanel(p_channel_id))
                     && cmd[0].ToLower() == responnse.Item2.ToLower())
                 {
-                    if (responnse.Item4 && priviledge.isAdmin(user_id))
+                    if (!responnse.Item4 || Priviledge.isAdmin(user_id))
                         sendMessage(p_channel_id, "<@" + user_id + "> " + responnse.Item3);
                     else
                         sendMessage(p_channel_id, "<@" + user_id + "> Admin priviledges needed.");
@@ -135,7 +133,7 @@ namespace DiscordBot
                 if ((command.Item1 == null || Me.Guilds[command.Item1].containChanel(p_channel_id))
                     && cmd[0].ToLower() == command.Item2.ToLower())
                 {
-                    if (!command.Item4 || priviledge.isAdmin(user_id))
+                    if (!command.Item4 || Priviledge.isAdmin(user_id))
                         sendMessage(p_channel_id, "<@" + user_id + "> " + command.Item3(cmd.Skip(1).ToArray(), user_id));
                     else
                         sendMessage(p_channel_id, "<@" + user_id + "> Admin priviledges needed.");
