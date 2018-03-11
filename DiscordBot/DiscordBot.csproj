@@ -63,21 +63,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Channels.cs" />
-    <Compile Include="csgo\stats.cs" />
-    <Compile Include="Discord.cs" />
-    <Compile Include="Gateway.cs" />
-    <Compile Include="Guilds.cs" />
-    <Compile Include="Me.cs" />
-    <Compile Include="Core.cs" />
-    <Compile Include="Member.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="Priviledge.cs" />
+    <Compile Include="Core\Channel.cs" />
+    <Compile Include="Features\Cleaner.cs" />
+    <Compile Include="Features\csgo\stats.cs" />
+    <Compile Include="Core\Discord.cs" />
+    <Compile Include="Core\Gateway.cs" />
+    <Compile Include="Core\Guild.cs" />
+    <Compile Include="Core\Me.cs" />
+    <Compile Include="Core\Core.cs" />
+    <Compile Include="Core\Member.cs" />
+    <Compile Include="Core\Message.cs" />
+    <Compile Include="Core\Priviledge.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="project_recover\Groups.cs" />
-    <Compile Include="project_recover\RepoManager.cs" />
+    <Compile Include="Features\project_recover\Groups.cs" />
+    <Compile Include="Features\project_recover\RepoManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Users.cs" />
+    <Compile Include="Core\Users.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
