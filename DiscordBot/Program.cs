@@ -13,9 +13,12 @@ namespace DiscordBot
         {
             Console.WriteLine(args);
             return "```" +
-                "!help display this message\n" +
-                "!join epitech mail : join the VR_POOL" +
-                "!csgostats SteamId : get you csogstats" + 
+                "@me help display this message\n" +
+                "@me join epitech mail : join the VR_POOL" +
+                "@me steamid name : get you steamid" +
+                "@me csgostats SteamId : get you csogstats" +
+                "@me display admins" +
+                "@me cleanText [me or number to delete]" +
                 "```";
         }
 
