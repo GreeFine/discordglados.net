@@ -12,7 +12,8 @@ namespace DiscordBot.project_recover
 
             var co = new CloneOptions();
             co.CredentialsProvider = (_url, _user, _cred) =>
-            new SshUserKeyCredentials {
+            new SshUserKeyCredentials
+            {
                 Username = "git",
                 Passphrase = string.Empty,
                 PublicKey = @"C:\Users\GreeFine\.ssh\id_rsa.pup",
@@ -30,7 +31,6 @@ namespace DiscordBot.project_recover
             Directory.CreateDirectory(p_dir_path);
             startInfo.FileName = "cmd.exe";
             startInfo.Arguments = "/C cd " + p_dir_path + " & git clone \"" + p_git_path + "\"";
-            Console.WriteLine(startInfo.Arguments);
             process.StartInfo = startInfo;
             process.Start();
             process.WaitForExit();
@@ -45,7 +45,6 @@ namespace DiscordBot.project_recover
             Directory.CreateDirectory(p_dir_path);
             startInfo.FileName = "cmd.exe";
             startInfo.Arguments = "/C cd " + p_dir_path + "/" + p_projet_name + " & git pull";
-            Console.WriteLine(startInfo.Arguments);
             process.StartInfo = startInfo;
             process.Start();
             process.WaitForExit();

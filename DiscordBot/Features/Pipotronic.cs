@@ -21,7 +21,7 @@ namespace DiscordBot.Features
             string PipoPhrase = "";
             foreach (var pipo in pipos)
             {
-                PipoPhrase += pipo[rand.Next(0, pipo.Length)] + " ";                
+                PipoPhrase += pipo[rand.Next(0, pipo.Length)] + " ";
                 if (++count == 5)
                     PipoPhrase += "les ";
             }

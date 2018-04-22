@@ -57,7 +57,7 @@ namespace DiscordBot
 
         public static async Task<JObject> Post(JObject p_data, string p_endpoint)
         {
-//            HttpClient client = new HttpClient();
+            //HttpClient client = new HttpClient();
             HttpClient client = new HttpClient(new LoggingHandler(new HttpClientHandler()));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
 
@@ -113,7 +113,7 @@ namespace DiscordBot
             };
             var returned = await client.SendAsync(request);
         }
-        
+
         public static async void Delete(string p_endpoint)
         {
             HttpClient client = new HttpClient();

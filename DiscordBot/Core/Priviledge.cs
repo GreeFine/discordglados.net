@@ -39,6 +39,6 @@ namespace DiscordBot
             storage.save(Data);
             return "Done";
         }
-        
+
     }
 }

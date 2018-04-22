@@ -12,10 +12,17 @@ namespace DiscordBot
         public static readonly Gateway instance = new Gateway();
         private Gateway() { }
 
+        const string path = @"./GateWay.JSON";
+        private static Core.Storage storage = new Core.Storage(path);
+
         Me Me = Me.instance;
 
-        public int heartbeat_interval_ = 0;
-        public int last_sequence_ = 0;
+        private int heartbeat_interval_ = 0;
+        private int last_sequence_ = 0;
+        private int ack_n_ = 0;
+        private string session_id_;
+        private bool invalid_session_ = false;
+
         private List<Tuple<string, string, string, bool>> mentioned_responsse = new List<Tuple<string, string, string, bool>>();
         private List<Tuple<string, string, Func<string[], Message, string>, bool>> mentioned_commands = new List<Tuple<string, string, Func<string[], Message, string>, bool>>();
 
@@ -36,55 +43,89 @@ namespace DiscordBot
         {
             using (var ws = new WebSocket(getPath() + "/?v=6&encoding=json"))
             {
-                ws.OnMessage += (sender, e) => eventParse(e.Data);
-                ws.Connect();
-                JObject empty = new JObject();
                 JObject jo = new JObject();
-                JObject gateway_identify = new JObject();
-                JObject properties = new JObject();
+                jo["op"] = 1;
 
-                properties["$os"] = "Windows_10";
-                properties["$browser"] = "Area.net";
-                properties["$device"] = "Area.net";
-
-                gateway_identify["token"] = "Bot " + DiscordWebRequest.bot_token_;
-                gateway_identify["properties"] = properties;
-                gateway_identify["compress"] = false;
-                //gateway_identify["large_threshold"] = 50;
-                //gateway_identify["shard"] = new JObject { 0, 1 };                
-                gateway_identify["presence"] = empty;
-
-                jo["op"] = 2;
-                jo["d"] = gateway_identify;
-                ws.Send(jo.ToString());
+                ws.OnMessage += (sender, e) => eventParse(ws, e.Data);
+                ws.Connect();
                 while (true)
                 {
-                    if (heartbeat_interval_ > 0)
+                    if (invalid_session_)
+                        return;
+                    else if (heartbeat_interval_ > 0)
                     {
-                        jo["op"] = 1;
                         jo["d"] = last_sequence_;
                         ws.Send(jo.ToString());
                         Thread.Sleep(heartbeat_interval_);
                     }
                     else
+                    {
+                        if (--heartbeat_interval_ < -2)
+                            return;
                         Thread.Sleep(500);
+                    }
                 }
             }
         }
 
-        private void eventParse(string p_msg)
+        private void eventParse(WebSocket ws, string p_msg)
         {
             var obj = JObject.Parse(p_msg);
-            if (obj.Value<int>("op") == 11)
-                return;
-            if (obj.Value<string>("t") != "PRESENCE_UPDATE")
-                Console.WriteLine(obj.ToString());
-            if (obj.Value<int>("op") == 10)
-                heartbeat_interval_ = obj.Value<JToken>("d").Value<int>("heartbeat_interval");
-            else if (obj.Value<int>("op") == 0 && obj.Value<string>("t") == "MESSAGE_CREATE")
-                messageEvent(obj);
-            else if (obj.Value<int>("op") == 0 && obj.Value<string>("t") == "VOICE_STATE_UPDATE")
-                voice_event(obj);
+            Console.WriteLine(obj);
+            var op = obj.Value<int>("op");
+            switch (op)
+            {
+                case 11:
+                    ++ack_n_;
+                    break;
+                case 10:
+                    heartbeat_interval_ = obj.Value<JToken>("d").Value<int>("heartbeat_interval");
+                    identify(ws);
+                    break;
+                case 9:
+                    invalid_session_ = true;
+                    break;
+                case 0:
+                    if (obj.TryGetValue("s", out JToken value))
+                        last_sequence_ = (int)value;
+                    if (obj.Value<string>("t") == "READY")
+                        ready_event(obj);
+                    if (obj.Value<string>("t") == "MESSAGE_CREATE")
+                        messageEvent(obj);
+                    else if (obj.Value<string>("t") == "VOICE_STATE_UPDATE")
+                        voice_event(obj);
+                    break;
+                default:
+                    break;
+            }
+        }
+        public void identify(WebSocket ws)
+        {
+            JObject empty = new JObject();
+            JObject jo = new JObject();
+            JObject gateway_identify = new JObject();
+            JObject properties = new JObject();
+
+            properties["$os"] = "Windows_10";
+            properties["$browser"] = "Area.net";
+            properties["$device"] = "Area.net";
+
+            gateway_identify["token"] = "Bot " + DiscordWebRequest.bot_token_;
+            gateway_identify["properties"] = properties;
+            gateway_identify["compress"] = false;
+            //gateway_identify["large_threshold"] = 50;
+            //gateway_identify["shard"] = new JObject { 0, 1 };                
+            gateway_identify["presence"] = empty;
+
+            jo["op"] = 2;
+            jo["d"] = gateway_identify;
+            ws.Send(jo.ToString());
+        }
+
+        private void ready_event(JObject obj)
+        {
+            //TODO PArse other data
+            session_id_ = obj.Value<string>("session_id");
         }
 
         private void messageEvent(JObject p_messge_event)
@@ -110,7 +151,7 @@ namespace DiscordBot
         {
             return "<@" + p_user_id + ">";
         }
-        
+
         private void reaction_triger(string p_channel_id, string p_msg, JObject p_d)
         {
             string user_id = p_d["author"].Value<string>("id");

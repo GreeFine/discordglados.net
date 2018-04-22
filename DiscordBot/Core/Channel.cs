@@ -35,7 +35,7 @@ namespace DiscordBot
         }
 
         public Message sendMessage(string p_content)
-        {            
+        {
             JObject jo = new JObject();
             jo["content"] = p_content;
 
@@ -57,8 +57,6 @@ namespace DiscordBot
             embeds["color"] = p_color;
             jo["content"] = p_content;
             jo["embed"] = embeds;
-            Console.WriteLine("DEBUG");
-            Console.WriteLine(jo.ToString());
 
             jo = (DiscordWebRequest.Post(jo, "/channels/" + id + "/messages").Result);
             Message message = new Message(jo, this);

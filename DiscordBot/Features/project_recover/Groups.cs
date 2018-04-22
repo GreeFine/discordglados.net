@@ -14,7 +14,6 @@ namespace DiscordBot.project_recover
 
         public string createGroup(string[] args, Message message)
         {
-            Console.WriteLine(args[0]);
             if (Data.TryGetValue("Groups", out JToken groups))
                 groups[args[0]] = new JObject();
             else
@@ -68,11 +67,7 @@ namespace DiscordBot.project_recover
 
         public string getGroups(string[] args, Message message)
         {
-            Console.WriteLine(args);
-            if (Data.TryGetValue("Groups", out JToken val))
-                Console.WriteLine(val);
-            else
-                Console.WriteLine("No groups yey");
+            Data.TryGetValue("Groups", out JToken val);
             return val + "\nDone";
         }
 
@@ -81,7 +76,7 @@ namespace DiscordBot.project_recover
             if (args.GetLength(0) != 1)
                 return "Usage : join your.email@epitech.eu";
             if (args[0].IndexOf("@epitech.eu") > 0)
-            {                
+            {
                 string[] args_pass = { "vr_pool", args[0] };
                 addMember(args_pass, message);
                 return "Done";
