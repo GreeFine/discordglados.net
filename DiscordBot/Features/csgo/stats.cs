@@ -33,9 +33,11 @@ namespace DiscordBot.csgo
             }
         }
 
-        public static string steamId(string p_name)
+        public static string steamId(string[] p_args)
         {
-            var request = Get("/ISteamUser/ResolveVanityURL/v0001/?key=" + steam_apikey + "&vanityurl=" + p_name)[0];
+            if (p_args.Length <= 0)
+                return "Invalid Argument";
+            var request = Get("/ISteamUser/ResolveVanityURL/v0001/?key=" + steam_apikey + "&vanityurl=" + p_args[0])[0];
             var response = request["response"];
             if (response.Value<int>("success") == 1)
             {
@@ -45,15 +47,19 @@ namespace DiscordBot.csgo
                 return "Not found";
         }
 
-        public static string get(string p_steamName)
+        public static string get(string[] p_args)
         {
             string response = "";
             string p_steamId;
             double n;
-            if (p_steamName.Length != "76561198149643878".Length || !double.TryParse(p_steamName, out n))
-                p_steamId = steamId(p_steamName);
+
+            if (p_args.Length <= 0)
+                return "Invalid arguments";
+            string steamName = p_args[0];
+            if (steamName.Length != "76561198149643878".Length || !double.TryParse(steamName, out n))
+                p_steamId = steamId(new string[] { steamName});
             else
-                p_steamId = p_steamName;
+                p_steamId = steamName;
             try
             {
                 response = Get("/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=" + steam_apikey + "&steamid=" + p_steamId).ToString().Remove(message_limit - 30);

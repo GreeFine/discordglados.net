@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiscordBot
@@ -19,17 +21,49 @@ namespace DiscordBot
 
         public static string getLoginURL()
         {
-            return ("https://discordapp.com/oauth2/authorize?client_id=380310980808409089&scope=bot");
+            return ("https://discordapp.com/oauth2/authorize?client_id=380310980808409089&scope=bot&permissions=519240");
         }
 
+        public class LoggingHandler : DelegatingHandler
+        {
+            public LoggingHandler(HttpMessageHandler innerHandler)
+                : base(innerHandler)
+            {
+            }
+
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                Console.WriteLine("Request:");
+                Console.WriteLine(request.ToString());
+                if (request.Content != null)
+                {
+                    Console.WriteLine(await request.Content.ReadAsStringAsync());
+                }
+                Console.WriteLine();
+
+                HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+
+                Console.WriteLine("Response:");
+                Console.WriteLine(response.ToString());
+                if (response.Content != null)
+                {
+                    Console.WriteLine(await response.Content.ReadAsStringAsync());
+                }
+                Console.WriteLine();
+
+                return response;
+            }
+        }
 
         public static async Task<JObject> Post(JObject p_data, string p_endpoint)
         {
-            HttpClient client = new HttpClient();
+//            HttpClient client = new HttpClient();
+            HttpClient client = new HttpClient(new LoggingHandler(new HttpClientHandler()));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
 
             var content = new StringContent(p_data.ToString(), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(base_api_url_ + p_endpoint, content);
+            HttpResponseMessage response = await client.PostAsync(base_api_url_ + p_endpoint, content);
+            //var response = await client.PostAsync(base_api_url_ + p_endpoint, content);
             var result = response.Content.ReadAsStringAsync().Result;
             if (result.Length > 0)
                 return JObject.Parse(result);

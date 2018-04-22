@@ -30,18 +30,16 @@ namespace DiscordBot
             return DiscordWebRequest.Get("/guilds/" + id + "/emojis");
         }
 
-        public void getMembers(int limit = 1)
+        public void getMembers(int limit = 100)
         {
             if (members_list_ == null)
                 members_list_ = new Dictionary<string, Members>();
             var membersGet = DiscordWebRequest.Get("/guilds/" + id + "/members?limit=" + limit.ToString());
-            foreach (var member in membersGet)
+            foreach (JObject member in membersGet)
             {
-                var name = member.Value<string>("name");
-                if (!members_list_.ContainsKey(name))
-                    members_list_[name] = new Members();
-                members_list_[name].id = member.Value<string>("id");
-                members_list_[name].name = member.Value<string>("name");
+                var username = member["user"].Value<string>("username");
+                var newMember = new Members(member);
+                members_list_[newMember.name] = newMember;
             }
         }
 

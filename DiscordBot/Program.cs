@@ -24,13 +24,12 @@ namespace DiscordBot
 
         static void steamInit(Discord discord)
         {
-            discord.Gateway.add_mentioned_command("steamid", (args, p_message) => csgo.stats.steamId(args[0]));
-            discord.Gateway.add_mentioned_command("csgostats", (args, p_message) => csgo.stats.get(args[0]));
+            discord.Gateway.add_mentioned_command("steamid", (args, p_message) => csgo.stats.steamId(args));
+            discord.Gateway.add_mentioned_command("csgostats", (args, p_message) => csgo.stats.get(args));
         }
 
         static void groupsInit(Discord discord)
         {
-            //group.initStorage();
             discord.Gateway.add_mentioned_command("createGroup", (args, p_message) => group.createGroup(args, p_message), null, true);
             discord.Gateway.add_mentioned_command("getGroups", (args, p_message) => group.getGroups(args, p_message), null, true);
             discord.Gateway.add_mentioned_command("addMember", (args, p_message) => group.addMember(args, p_message), null, true);
@@ -44,7 +43,6 @@ namespace DiscordBot
 
         static void basicInit(Discord discord)
         {
-
             discord.Gateway.add_mentioned_reaction("info", "I am a little bot made by GreeFine");
             discord.Gateway.add_mentioned_reaction("", "You asked for me ?");
             discord.Gateway.add_mentioned_reaction("poke", "Poke !");
@@ -53,6 +51,9 @@ namespace DiscordBot
             discord.Gateway.add_mentioned_command("addAdmin", (args, p_message) => Priviledge.addAdmin(args), null, true);
 
             discord.Gateway.add_mentioned_command("cleanText", (args, p_message) => Cleaner.channel_remove_text_message(args, p_message), null, true);
+            discord.Gateway.add_mentioned_command("pipo", (args, p_message) => Pipotronic.getPipo(), null, true);
+            discord.Gateway.add_mentioned_command("someone", (args, p_message) => Someone.find(p_message), null, true);
+            discord.Gateway.add_mentioned_command("pipoGame", (args, p_message) => Pipotronic.pipoGame(p_message), null, true);
 
             discord.Gateway.add_mentioned_command("help", help);
         }

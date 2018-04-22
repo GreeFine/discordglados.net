@@ -1,2 +1,8 @@
 ./DiscordBot/bin
 ./obj/Debug
+
+\.vs/DiscordBot/v15/
+
+DiscordBot/obj/Debug/
+
+DiscordBot/bin/Debug/

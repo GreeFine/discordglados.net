@@ -7,7 +7,19 @@ namespace DiscordBot
     {
         public string id;
         public string name;
+        public string nick;
         public string Private_Channel;
+        public JArray roles;
+
+        public Members(JObject obj)
+        {
+            nick = obj.Value<string>("nick");
+            var user = obj["user"];
+            name = user.Value<string>("username");
+            id = user.Value<string>("id");
+            roles = obj.Value<JArray>("roles");
+        }
+
         public string sendMessage(string p_msg)
         {
             JObject jo = new JObject();

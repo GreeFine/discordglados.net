@@ -102,10 +102,15 @@ namespace DiscordBot
                 if (d.TryGetValue("channel_id", out JToken channel_id))
                     if (d.TryGetValue("guild_id", out JToken guild_id) && guild_id.ToString() == "229633582665170944")
                         ;
-                        //   var user_name = getGuildMemberName(guild_id.ToString(), user_id.ToString());
-                        //sendMessage("382250514752208897", "<@" + user_id.ToString() + ">" + " Moved to channel : " + "<#" + channel_id + ">");
+            //   var user_name = getGuildMemberName(guild_id.ToString(), user_id.ToString());
+            //sendMessage("382250514752208897", "<@" + user_id.ToString() + ">" + " Moved to channel : " + "<#" + channel_id + ">");
         }
 
+        string userTag(string p_user_id)
+        {
+            return "<@" + p_user_id + ">";
+        }
+        
         private void reaction_triger(string p_channel_id, string p_msg, JObject p_d)
         {
             string user_id = p_d["author"].Value<string>("id");
@@ -117,9 +122,9 @@ namespace DiscordBot
                     && cmd[0].ToLower() == responnse.Item2.ToLower())
                 {
                     if (!responnse.Item4 || Priviledge.isAdmin(user_id))
-                        sendMessage(p_channel_id, "<@" + user_id + "> " + responnse.Item3);
+                        channel.sendEmbedObject(responnse.Item2, responnse.Item3, userTag(user_id));
                     else
-                        sendMessage(p_channel_id, "<@" + user_id + "> Admin priviledges needed.");
+                        channel.sendEmbedObject(responnse.Item2, "Admin priviledges needed.", userTag(user_id));
                     return;
                 }
             }
@@ -136,9 +141,9 @@ namespace DiscordBot
                     && cmd[0].ToLower() == command.Item2.ToLower())
                 {
                     if (!command.Item4 || Priviledge.isAdmin(user_id))
-                        channel.sendMessage("<@" + user_id + "> " + command.Item3(cmd.Skip(1).ToArray(), new Message(p_raw, channel)));
+                        channel.sendEmbedObject(command.Item2, command.Item3(cmd.Skip(1).ToArray(), new Message(p_raw, channel)), userTag(user_id));
                     else
-                        channel.sendMessage("<@" + user_id + "> Admin priviledges needed.");
+                        channel.sendEmbedObject(command.Item2, "Admin priviledges needed.", userTag(user_id));
                     return;
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace DiscordBot
@@ -33,10 +34,31 @@ namespace DiscordBot
             return DiscordWebRequest.Get("/channels/" + id);
         }
 
-        public Message sendMessage(string p_msg)
+        public Message sendMessage(string p_content)
         {            
             JObject jo = new JObject();
-            jo["content"] = p_msg;
+            jo["content"] = p_content;
+
+            jo = (DiscordWebRequest.Post(jo, "/channels/" + id + "/messages").Result);
+            Message message = new Message(jo, this);
+            if (!Messages_list.ContainsKey(message.id))
+                Messages_list.Add(message.id, message);
+            return message;
+        }
+
+
+        public Message sendEmbedObject(string p_title, string p_description, string p_content = "", int p_color = 0x3380ff)
+        {
+            JObject jo = new JObject();
+            JObject embeds = new JObject();
+
+            embeds["title"] = p_title;
+            embeds["description"] = p_description;
+            embeds["color"] = p_color;
+            jo["content"] = p_content;
+            jo["embed"] = embeds;
+            Console.WriteLine("DEBUG");
+            Console.WriteLine(jo.ToString());
 
             jo = (DiscordWebRequest.Post(jo, "/channels/" + id + "/messages").Result);
             Message message = new Message(jo, this);

@@ -75,6 +75,8 @@
     <Compile Include="Core\Member.cs" />
     <Compile Include="Core\Message.cs" />
     <Compile Include="Core\Priviledge.cs" />
+    <Compile Include="Features\Pipotronic.cs" />
+    <Compile Include="Features\Someone.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Features\project_recover\Groups.cs" />
     <Compile Include="Features\project_recover\RepoManager.cs" />
