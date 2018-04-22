@@ -66,8 +66,7 @@ namespace DiscordBot
             groupsInit(discord);
             steamInit(discord);
 
-            Thread th = new Thread(discord.Gateway.connect);
-            th.Start();
+            discord.Gateway.connect();
 
             var line = "";
             var guild = "";
@@ -89,9 +88,11 @@ namespace DiscordBot
                     else if (line.StartsWith("/delete"))
                         discord.Me.Guilds[guild].Channels_list[channel].Messages_list[line.Replace("/delete ", "")].delete();
                     else if (line.StartsWith("/showevents"))
-                        Console.Write("Show events = " + (Gateway.ShowEvents = !Gateway.ShowEvents));
+                        Console.WriteLine("Show events = " + (Gateway.ShowEvents = !Gateway.ShowEvents));
                     else if (line.StartsWith("/debug"))
-                        Console.Write("Debug = " + (DiscordWebRequest.ShowDebug = !DiscordWebRequest.ShowDebug));
+                        Console.WriteLine("Debug = " + (DiscordWebRequest.ShowDebug = !DiscordWebRequest.ShowDebug));
+                    else if (line.StartsWith("/reconnect"))
+                        Console.WriteLine("Reconnecting...");
                 }
                 catch (Exception e) { Console.WriteLine(e.Message); }
             }

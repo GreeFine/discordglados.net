@@ -24,8 +24,6 @@ namespace DiscordBot
             }
         }
 
-
-
         private int heartbeat_interval_ = 0;
         private int last_sequence_ = 0;
         private int ack_n_ = 0;
@@ -33,14 +31,18 @@ namespace DiscordBot
         private bool invalid_session_ = false;
         private bool connect_failed_ = false;
 
-        public static bool ShowEvents = false;
+        public static bool ShowEvents = true;
 
         private List<Tuple<string, string, string, bool>> mentioned_responsse = new List<Tuple<string, string, string, bool>>();
         private List<Tuple<string, string, Func<string[], Message, string>, bool>> mentioned_commands = new List<Tuple<string, string, Func<string[], Message, string>, bool>>();
 
         private string getPath()
         {
-            return DiscordWebRequest.Get("/gateway").First.Value<string>("url");
+            var gatePath = DiscordWebRequest.Get("/gateway");
+            if (gatePath != null)
+                return gatePath.First.Value<string>("url");
+            else
+                return null;
         }
 
         public string sendMessage(string p_channel_id, string p_msg)
@@ -51,35 +53,54 @@ namespace DiscordBot
             return (DiscordWebRequest.Post(jo, "/channels/" + p_channel_id + "/messages").Result).Value<string>("id");
         }
 
-        public void connect()
+        public void reconnect(string p_error_msg)
         {
-            using (var ws = new WebSocket(getPath() + "/?v=6&encoding=json"))
-            {
-                JObject jo = new JObject();
-                jo["op"] = 1;
+            Console.WriteLine(p_error_msg);
+            Console.WriteLine("Trying to reconnect in 5 seconds");
+            Thread.Sleep(5000);
+            connect();
+            return;
+        }
 
-                ws.OnMessage += (sender, e) => eventParse(ws, e.Data);
-                ws.Connect();
-                while (true)
+        public async void connect()
+        {
+            var api_path = getPath();
+            if (api_path != null)
+                using (var ws = new WebSocket(api_path + "/?v=6&encoding=json"))
                 {
-                    if (connect_failed_)
-                        return;
-                    else if (heartbeat_interval_ > 0)
-                    {
-                        storage.addAndSave("last_sequence", last_sequence_);
+                    JObject jo = new JObject();
+                    jo["op"] = 1;
 
-                        jo["d"] = last_sequence_;
-                        ws.Send(jo.ToString());
-                        Thread.Sleep(heartbeat_interval_);
-                    }
-                    else
+                    ws.OnMessage += (sender, e) => eventParse(ws, e.Data);
+                    ws.OnError += (sender, error) => reconnect(error.Message);
+                    ws.OnClose += (sender, closeArg) => reconnect(closeArg.Reason);
+                    ws.Connect();
+                    while (true)
                     {
-                        if (--heartbeat_interval_ < -2)
-                            return;
-                        Thread.Sleep(500);
+                        if (connect_failed_)
+                        {
+                            Console.WriteLine("Not able to connect closing connection.");
+                            ws.Close();
+                            Environment.Exit(1);
+                        }
+                        else if (heartbeat_interval_ > 0)
+                        {
+                            storage.addAndSave("last_sequence", last_sequence_);
+
+                            jo["d"] = last_sequence_;
+                            ws.Send(jo.ToString());
+                            Thread.Sleep(heartbeat_interval_);
+                        }
+                        else
+                        {
+                            if (--heartbeat_interval_ < -2)
+                                return;
+                            Thread.Sleep(500);
+                        }
                     }
                 }
-            }
+            else
+                reconnect("Could no request Gateway path");
         }
 
         private void eventParse(WebSocket ws, string p_msg)
@@ -147,11 +168,12 @@ namespace DiscordBot
         public void resume(WebSocket ws)
         {
             JObject jo = new JObject();
-            JObject resume = new JObject();
-
-            resume["token"] = "Bot " + DiscordWebRequest.bot_token_;
-            resume["session_id"] = session_id_;
-            resume["seq"] = last_sequence_;
+            JObject resume = new JObject
+            {
+                ["token"] = "Bot " + DiscordWebRequest.bot_token_,
+                ["session_id"] = session_id_,
+                ["seq"] = last_sequence_
+            };
 
             jo["op"] = 6;
             jo["d"] = resume;

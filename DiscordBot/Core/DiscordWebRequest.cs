@@ -62,13 +62,11 @@ namespace DiscordBot
         {
             HttpClient client;
             if (ShowDebug)
-            {
                 client = new HttpClient(new LoggingHandler(new HttpClientHandler()));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
-            }
             else
                 client = new HttpClient();
 
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", bot_token_);
             var content = new StringContent(p_data.ToString(), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync(base_api_url_ + p_endpoint, content);
             var result = response.Content.ReadAsStringAsync().Result;
@@ -96,15 +94,23 @@ namespace DiscordBot
             request.Headers.Add(HttpRequestHeader.Authorization, "Bot " + bot_token_);
             request.UserAgent = "DiscordBot (http:/smartdeck.ovh:8080/area, 0.4)";
             request.ContentType = "x-www-form-urlencoded";
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            try
             {
-                html = reader.ReadToEnd();
-                if (html[0] != '[')
-                    html = '[' + html + ']';
-                return (JArray.Parse(html));
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    html = reader.ReadToEnd();
+                    if (html[0] != '[')
+                        html = '[' + html + ']';
+                    return (JArray.Parse(html));
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return null;
         }
 
         public static async void Patch(JObject p_data, string p_endpoint)

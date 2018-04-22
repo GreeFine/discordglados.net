@@ -13,7 +13,7 @@ namespace DiscordBot
         private FileStream fileStream;
         public Storage(string p_path)
         {
-            fileStream = new FileStream(p_path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fileStream = new FileStream(p_path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
 
             if (fileStream.Read(buffer, 0, size) == 0)
                 save(new JObject());
