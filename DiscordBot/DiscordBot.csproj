@@ -71,7 +71,7 @@
     <Compile Include="Core\Gateway.cs" />
     <Compile Include="Core\Guild.cs" />
     <Compile Include="Core\Me.cs" />
-    <Compile Include="Core\Core.cs" />
+    <Compile Include="Core\DiscordWebRequest.cs" />
     <Compile Include="Core\Member.cs" />
     <Compile Include="Core\Message.cs" />
     <Compile Include="Core\Priviledge.cs" />

@@ -88,9 +88,13 @@ namespace DiscordBot
                         discord.Me.changeName(line.Replace("/changename ", ""));
                     else if (line.StartsWith("/delete"))
                         discord.Me.Guilds[guild].Channels_list[channel].Messages_list[line.Replace("/delete ", "")].delete();
-            }
+                    else if (line.StartsWith("/showevents"))
+                        Console.Write("Show events = " + (Gateway.ShowEvents = !Gateway.ShowEvents));
+                    else if (line.StartsWith("/debug"))
+                        Console.Write("Debug = " + (DiscordWebRequest.ShowDebug = !DiscordWebRequest.ShowDebug));
+                }
                 catch (Exception e) { Console.WriteLine(e.Message); }
-        }
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace DiscordBot.project_recover
     class Groups
     {
         const string path = @"./storage.JSON";
-        private static Core.Storage storage = new Core.Storage(path);
+        private static Storage storage = new Storage(path);
 
         private static JObject data;
         public JObject Data { get { if (data == null) data = storage.get(); return data; } set { data = value; } }

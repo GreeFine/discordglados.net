@@ -6,7 +6,7 @@ namespace DiscordBot
     class Priviledge
     {
         const string path = @"./Priviledge.JSON";
-        private static Core.Storage storage = new Core.Storage(path);
+        private static Storage storage = new Storage(path);
 
         private static JObject data;
         private static JObject Data { get { if (data == null) data = storage.get(); return data; } set { data = value; } }

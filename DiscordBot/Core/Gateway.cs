@@ -9,19 +9,31 @@ namespace DiscordBot
 {
     public class Gateway
     {
-        public static readonly Gateway instance = new Gateway();
-        private Gateway() { }
-
-        const string path = @"./GateWay.JSON";
-        private static Core.Storage storage = new Core.Storage(path);
-
         Me Me = Me.instance;
+        const string path = @"./GateWay.JSON";
+        private static Storage storage = new Storage(path);
+
+        public static readonly Gateway instance = new Gateway();
+        private Gateway()
+        {
+            var saved = storage.get();
+            if (saved["d"] != null)
+            {
+                last_sequence_ = saved.Value<int>("last_sequence");
+                session_id_ = saved["d"].Value<string>("session_id");
+            }
+        }
+
+
 
         private int heartbeat_interval_ = 0;
         private int last_sequence_ = 0;
         private int ack_n_ = 0;
         private string session_id_;
         private bool invalid_session_ = false;
+        private bool connect_failed_ = false;
+
+        public static bool ShowEvents = false;
 
         private List<Tuple<string, string, string, bool>> mentioned_responsse = new List<Tuple<string, string, string, bool>>();
         private List<Tuple<string, string, Func<string[], Message, string>, bool>> mentioned_commands = new List<Tuple<string, string, Func<string[], Message, string>, bool>>();
@@ -50,10 +62,12 @@ namespace DiscordBot
                 ws.Connect();
                 while (true)
                 {
-                    if (invalid_session_)
+                    if (connect_failed_)
                         return;
                     else if (heartbeat_interval_ > 0)
                     {
+                        storage.addAndSave("last_sequence", last_sequence_);
+
                         jo["d"] = last_sequence_;
                         ws.Send(jo.ToString());
                         Thread.Sleep(heartbeat_interval_);
@@ -71,8 +85,9 @@ namespace DiscordBot
         private void eventParse(WebSocket ws, string p_msg)
         {
             var obj = JObject.Parse(p_msg);
-            Console.WriteLine(obj);
             var op = obj.Value<int>("op");
+            if (ShowEvents)
+                Console.WriteLine(obj);
             switch (op)
             {
                 case 11:
@@ -80,9 +95,14 @@ namespace DiscordBot
                     break;
                 case 10:
                     heartbeat_interval_ = obj.Value<JToken>("d").Value<int>("heartbeat_interval");
-                    identify(ws);
+                    resume(ws);
                     break;
                 case 9:
+                    Console.WriteLine("Invalid sessions...");
+                    if (!invalid_session_)
+                        identify(ws);
+                    else
+                        connect_failed_ = true;
                     invalid_session_ = true;
                     break;
                 case 0:
@@ -92,8 +112,8 @@ namespace DiscordBot
                         ready_event(obj);
                     if (obj.Value<string>("t") == "MESSAGE_CREATE")
                         messageEvent(obj);
-                    else if (obj.Value<string>("t") == "VOICE_STATE_UPDATE")
-                        voice_event(obj);
+                    //else if (obj.Value<string>("t") == "VOICE_STATE_UPDATE")
+                    //voice_event(obj);
                     break;
                 default:
                     break;
@@ -119,13 +139,33 @@ namespace DiscordBot
 
             jo["op"] = 2;
             jo["d"] = gateway_identify;
+            Thread.Sleep(1500);
+            Console.WriteLine("Identiying....");
+            ws.Send(jo.ToString());
+        }
+
+        public void resume(WebSocket ws)
+        {
+            JObject jo = new JObject();
+            JObject resume = new JObject();
+
+            resume["token"] = "Bot " + DiscordWebRequest.bot_token_;
+            resume["session_id"] = session_id_;
+            resume["seq"] = last_sequence_;
+
+            jo["op"] = 6;
+            jo["d"] = resume;
+
+            Console.WriteLine("Resuming(" + session_id_ + " : " + last_sequence_ + ")...");
             ws.Send(jo.ToString());
         }
 
         private void ready_event(JObject obj)
         {
             //TODO PArse other data
-            session_id_ = obj.Value<string>("session_id");
+            session_id_ = obj["d"].Value<string>("session_id");
+            obj["last_sequence"] = 0;
+            storage.save(obj);
         }
 
         private void messageEvent(JObject p_messge_event)
@@ -142,9 +182,7 @@ namespace DiscordBot
             if (d.TryGetValue("user_id", out JToken user_id))
                 if (d.TryGetValue("channel_id", out JToken channel_id))
                     if (d.TryGetValue("guild_id", out JToken guild_id) && guild_id.ToString() == "229633582665170944")
-                        ;
-            //   var user_name = getGuildMemberName(guild_id.ToString(), user_id.ToString());
-            //sendMessage("382250514752208897", "<@" + user_id.ToString() + ">" + " Moved to channel : " + "<#" + channel_id + ">");
+                        sendMessage("382250514752208897", "<@" + user_id.ToString() + ">" + " Moved to channel : " + "<#" + channel_id + ">");
         }
 
         string userTag(string p_user_id)
